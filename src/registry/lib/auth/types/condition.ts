@@ -7,14 +7,14 @@ type Primitive = string | boolean | number | bigint;
 type Fact = "context";
 
 type DotPathMap<T, Prefix extends string = ""> = {
-	[K in keyof T & string]: T[K] extends Primitive
-		? { path: `${Prefix}${K}`; type: T[K] }
-		: T[K] extends Date
+	[K in keyof T & string]-?: NonNullable<T[K]> extends Primitive
+		? { path: `${Prefix}${K}`; type: NonNullable<T[K]> }
+		: NonNullable<T[K]> extends Date
 			? { path: `${Prefix}${K}`; type: Date }
-			: T[K] extends Array<infer U>
+			: NonNullable<T[K]> extends Array<infer U>
 				? { path: `${Prefix}${K}`; type: Array<U> }
-				: T[K] extends Record<infer _k, unknown>
-					? DotPathMap<T[K], `${Prefix}${K}.`>
+				: NonNullable<T[K]> extends Record<string, unknown>
+					? DotPathMap<NonNullable<T[K]>, `${Prefix}${K}.`>
 					: never;
 }[keyof T & string];
 
