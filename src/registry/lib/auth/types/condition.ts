@@ -41,7 +41,7 @@ export type ConditionNode<
 					| K["type"]
 					| {
 							fact: Fact;
-							path: `$.${Exclude<Extract<P, { type: K["type"] }>["path"], K["path"]>}`;
+							path: `$.${Exclude<Extract<P, { type: K["type"] } | { type: K["type"][] }>["path"], K["path"]>}`;
 					  };
 			};
 		}[P["path"]]
