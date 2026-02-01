@@ -32,6 +32,7 @@ export class AccessControl<
 	ResourceMap extends { [K in keyof ResourceMap]: BaseResource<K & string> },
 > {
 	#config: AccessControlConfig<S, Actions, ResourceMap>;
+	#evalEngine = new Engine();
 	async #checkAccess(
 		subject: S,
 		action: Actions[number],
@@ -52,8 +53,7 @@ export class AccessControl<
 				throw new Error(
 					"No conditions/policies found for subject, resource/resource-type combo.",
 				);
-			const evalEngine = new Engine();
-			evalEngine.addFact(
+			this.#evalEngine.addFact(
 				"context",
 				typeof resource === "string"
 					? { subject: subject }
@@ -63,15 +63,15 @@ export class AccessControl<
 						},
 			);
 			for (const condition of conditions) {
-				evalEngine.removeRule("rule");
-				evalEngine.addRule({
+				this.#evalEngine.removeRule("rule");
+				this.#evalEngine.addRule({
 					name: "rule",
 					conditions: condition,
 					event: {
 						type: "success",
 					},
 				});
-				const { events } = await evalEngine.run();
+				const { events } = await this.#evalEngine.run();
 				if (events[0]) return true;
 			}
 			return false;
