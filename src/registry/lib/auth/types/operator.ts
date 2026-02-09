@@ -1,40 +1,32 @@
-type StringOperators =
-	| "equal"
-	| "notEqual"
-	| "contains"
-	| "doesNotContain"
-	| "startsWith"
-	| "endsWith";
+type BaseOperators = "equal" | "notEqual";
+
+type StringOperators = BaseOperators;
 
 type NumberOperators =
-	| "equal"
-	| "notEqual"
+	| BaseOperators
 	| "greaterThan"
 	| "greaterThanInclusive"
 	| "lessThan"
 	| "lessThanInclusive";
 
-type BooleanOperators = "equal" | "notEqual";
+type BooleanOperators = BaseOperators;
 
 type DateOperators =
-	| "equal"
-	| "notEqual"
-	| "greaterThan"
-	| "greaterThanInclusive"
-	| "lessThan"
-	| "lessThanInclusive"
-	| "before"
-	| "after";
+	| NumberOperators
+	| "elapsedGreaterThan"
+	| "elapsedGreaterThanInclusive"
+	| "elapsedLessThan"
+	| "elapsedLessThanInclusive"
+	| "remainingGreaterThan"
+	| "remainingGreaterThanInclusive"
+	| "remainingLessThan"
+	| "remainingLessThanInclusive";
 
-type ArrayOperators =
-	| "equal"
-	| "notEqual"
-	| "lengthEqual"
-	| "lengthNotEqual"
-	| "lengthGreaterThan"
-	| "lengthLessThan";
+type ArrayOperators = BaseOperators;
 
-export type OperatorFor<T> = T extends string
+type MembershipOperators = "includes" | "in";
+
+type OperatorFor<T> = T extends string
 	? StringOperators
 	: T extends number
 		? NumberOperators
@@ -47,3 +39,12 @@ export type OperatorFor<T> = T extends string
 					: T extends Array<unknown>
 						? ArrayOperators
 						: never;
+
+export type OperatorForRelation<T, S> =
+	T extends Array<unknown>
+		? S extends Array<unknown>
+			? ArrayOperators
+			: Extract<MembershipOperators, "includes">
+		: S extends Array<unknown>
+			? Extract<MembershipOperators, "in">
+			: OperatorFor<T>;
