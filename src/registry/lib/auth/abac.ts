@@ -59,10 +59,9 @@ export class AccessControl<
 							subject: subject,
 							resource: resource,
 						};
-			conditions.some((condition) => {
+			return conditions.some((condition) => {
 				return evaluateCondition(condition, context);
 			});
-			return false;
 		} catch (e) {
 			console.error(e);
 			return false;

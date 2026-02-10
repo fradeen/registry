@@ -6,13 +6,13 @@ import type { BaseSubject } from "@/registry/lib/auth/types/subject";
 type Primitive = string | boolean | number | bigint;
 
 type DotPathMap<T, Prefix extends string = ""> = {
-	[K in keyof T & string]-?: T[K] extends Primitive
-		? { path: `${Prefix}${K}`; type: T[K] }
-		: T[K] extends Date
+	[K in keyof T & string]-?: NonNullable<T[K]> extends Primitive
+		? { path: `${Prefix}${K}`; type: NonNullable<T[K]> }
+		: NonNullable<T[K]> extends Date
 			? { path: `${Prefix}${K}`; type: Date }
-			: T[K] extends Array<infer U>
+			: NonNullable<T[K]> extends Array<infer U>
 				? { path: `${Prefix}${K}`; type: Array<U> }
-				: T[K] extends Record<string, unknown>
+				: NonNullable<T[K]> extends Record<string, unknown>
 					? DotPathMap<T[K], `${Prefix}${K}.`>
 					: never;
 }[keyof T & string];
@@ -44,7 +44,9 @@ export type ConditionNode<
 					| {
 							path: `$.${K["path"]}`;
 							operator: OperatorForRelation<K["type"], ElementType<K["type"]>>;
-							value: ElementType<K["type"]>;
+							value: ElementType<K["type"]> extends Date
+								? number | ElementType<K["type"]>
+								: ElementType<K["type"]>;
 					  }
 					| {
 							path: `$.${K["path"]}`;

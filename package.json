@@ -1,7 +1,7 @@
 {
 	"name": "registry",
 	"type": "module",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy --minify",
@@ -25,7 +25,7 @@
 		"@vitest/coverage-v8": "^4.0.18",
 		"shadcn": "^3.8.4",
 		"vitest": "^4.0.18",
-		"wrangler": "^4.63.0"
+		"wrangler": "^4.64.0"
 	},
 	"dependencies": {
 		"lodash": "^4.17.23"

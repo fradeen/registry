@@ -5,4 +5,9 @@ export default defineConfig({
 		environment: "edge-runtime",
 		include: ["test/**/*.test.ts", "test/**/*.spec.ts"],
 	},
+	resolve: {
+		alias: {
+			"@": "/src/",
+		},
+	},
 });
