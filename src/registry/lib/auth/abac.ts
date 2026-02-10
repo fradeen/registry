@@ -1,4 +1,4 @@
-import { Engine } from "json-rules-engine";
+import { evaluateCondition } from "@/registry/lib/auth/eval";
 import type { Condition } from "@/registry/lib/auth/types/condition";
 import type { BaseResource } from "@/registry/lib/auth/types/resource";
 import type { BaseSubject } from "@/registry/lib/auth/types/subject";
@@ -52,29 +52,16 @@ export class AccessControl<
 				throw new Error(
 					"No conditions/policies found for subject, resource/resource-type combo.",
 				);
-			const evalEngine = new Engine();
-			evalEngine.addFact(
-				"context",
+			const context =
 				typeof resource === "string"
 					? { subject: subject }
 					: {
 							subject: subject,
 							resource: resource,
-						},
-			);
-			for (const condition of conditions) {
-				evalEngine.removeRule("rule");
-				evalEngine.addRule({
-					name: "rule",
-					conditions: condition,
-					event: {
-						type: "success",
-					},
-				});
-				const { events } = await evalEngine.run();
-				if (events[0]) return true;
-			}
-			return false;
+						};
+			return conditions.some((condition) => {
+				return evaluateCondition(condition, context);
+			});
 		} catch (e) {
 			console.error(e);
 			return false;
