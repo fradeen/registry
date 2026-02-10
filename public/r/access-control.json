@@ -4,6 +4,7 @@
 	"title": "Attribute Based Access Control",
 	"description": "Attribute based access controll system",
 	"dependencies": ["lodash@^4.17.23"],
+	"devDependencies": ["@types/lodash@^4.17.23"],
 	"files": [
 		{
 			"path": "src/registry/lib/auth/abac.ts",
