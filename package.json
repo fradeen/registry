@@ -1,7 +1,7 @@
 {
 	"name": "registry",
 	"type": "module",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy --minify",
@@ -11,7 +11,7 @@
 		"build": "npm run registry:build && npm run format",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage"
 	},
 	"devEngines": {
 		"packageManager": {
