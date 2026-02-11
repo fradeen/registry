@@ -2,15 +2,9 @@
 
 
 > [!WARNING]
-> **Warning — Alpha quality**
+> **Alpha quality**
 >
 > This project is alpha-quality software and may break unexpectedly. Use at your own risk. You are responsible for auditing the security and correctness of this code before using it in production.
-
-
-> [!WARNING]
-> **Known issues**
->
-> - Adding optional keys to Subject or Resource types can break TypeScript type inference. Prefer required keys or explicit type annotations until this is resolved.
 
 This repository provides a small, strongly-typed, and fully serializable ABAC helper set intended to be copied into your project by the shadcn CLI. It focuses on type-safety, runtime-evaluable Conditions, and easy persistence of entitlements/policies.
 
@@ -25,6 +19,7 @@ npx shadcn@latest add https://registry.frad-fardeen.workers.dev/r/access-control
 ### Key files
 
 - `src/registry/lib/auth/abac.ts` — AccessControl implementation.
+- `src/registry/lib/auth/eval.ts` — Condition parsing/eval implementation.
 - `src/registry/lib/auth/types/*` — Strongly-typed building blocks:
   - `subject.ts`, `resource.ts`, `condition.ts`, `operator.ts`, `policy.ts`, `entitlement.ts`
 
@@ -63,20 +58,22 @@ creating types for subject, resources, actions...
 ```ts
 import { AccessControl } from "@/registry/lib/auth/abac";
 import type { Condition } from "@/registry/lib/auth/types/condition";
-import type { BaseResourceMap } from "@/registry/lib/auth/types/resource";
 import type { Entitlement } from "@/registry/lib/auth/types/entitlement";
+import type { BaseResourceMap } from "@/registry/lib/auth/types/resource";
 
-/* Resource and action types */
-export type Doc = { type: "doc"; ownerId: number; published: boolean };
-export type Image = { type: "image"; ownerId: number };
+type User = { id: number; name: string; role: "user" | "admin" };
+type Doc = {
+	type: "doc";
+	ownerId: number;
+	published: boolean;
+	editors?: number[];
+};
+type Image = { type: "image"; ownerId: number };
 
-export type ResourceMap = BaseResourceMap<{ doc: Doc; image: Image }>;
+type ResourceMap = BaseResourceMap<{ doc: Doc; image: Image }>;
 
-export const ACTIONS = ["read", "edit"] as const;
-export type Actions = typeof ACTIONS;
-export type Action = Actions[number];
-
-export type User = { id: number; name: string };
+const ACTIONS = ["read", "edit"] as const;
+type Actions = typeof ACTIONS;
 ```
 In-line / in-code entitlements (serializable)
 
@@ -84,7 +81,7 @@ Entitlements are plain objects you can keep in source, JSON files, or a DB.
 At runtime, getConditions reads entitlements and converts them to Condition ASTs.
 Example entitlement store (could be DB rows / KV values):
 ```ts
-const entitlement: Entitlement<User, Doc, typeof ACTIONS> = {
+const entitlement = {
 	id: 123,
 	title: "doc access policies",
 	description: "",
@@ -92,30 +89,37 @@ const entitlement: Entitlement<User, Doc, typeof ACTIONS> = {
 	policies: {
 		edit: {
 			requiresResource: true,
-			// serialized condition: subject.id == resource.ownerId
 			conditions: {
-				kind: "all",
-				all: [
+				kind: "any",
+				any: [
+					// serialized condition: subject.id == resource.ownerId
 					{
-						fact: "context",
 						path: "$.subject.id",
 						operator: "equal",
-						value: {
-							fact: "context",
-							path: "$.resource.ownerId",
-						},
+						value: "$.resource.ownerId",
+					},
+					// serialized condition: subject.id in editors list.
+					{
+						path: "$.subject.id",
+						operator: "in",
+						value: "$.resource.editors",
+					},
+					// serialized condition: subject.role === admin.
+					{
+						path: "$.subject.role",
+						operator: "equal",
+						value: "admin",
 					},
 				],
 			},
 		},
 		read: {
 			requiresResource: true,
-			// comparison with literal values
 			conditions: {
 				kind: "all",
 				all: [
+					// comparison with literal values
 					{
-						fact: "context",
 						path: "$.resource.published",
 						operator: "equal",
 						value: true,
@@ -124,14 +128,14 @@ const entitlement: Entitlement<User, Doc, typeof ACTIONS> = {
 			},
 		},
 	},
-};
+} satisfies Entitlement<User, Doc, typeof ACTIONS>;
 ```
 AccessControl instantiation and getConditions
 
 ```ts
 const ac = new AccessControl<User, Actions, ResourceMap>({
 	actions: ACTIONS,
-	async getConditions(_subject, resourceOrType, action, _requiresResource) {
+	async getConditions(_subject, _resourceOrType, action, _requiresResource) {
 		// Load entitlements for this action + resource type (from memory/DB/KV)
 		const matches = entitlement.policies[action]?.conditions;
 
@@ -146,21 +150,20 @@ Check examples
 ```ts
 // Check with a resource instance (requiresResource=true)
 const allowed = await ac
-	.can({ id: 1, name: "A" })
+	.can({ id: 1, name: "User", role: "user" })
 	.read({ type: "doc", ownerId: 1, published: true });
 // Check by resource type only (requiresResource=false)
-const allowedByType = await ac.can({ id: 1, name: "A" }).read("doc");
+const allowedByType = await ac
+	.can({ id: 2, name: "Admin", role: "admin" })
+	.edit("doc");
 ```
 
-#### Serialization & persistence
+### Serialization & persistence
 
-Conditions, Policies and Entitlements are simple JSON-compatible objects (no functions). You can:
-store them in a relational DB as JSON columns
-write them into KV stores, S3, or files
-transfer them between services
-When loaded, getConditions should rehydrate these objects (if needed) and return Condition ASTs that the AccessControl evaluator runs against the provided evaluation context ({ subject, resource, env, ... }).
+Conditions, Policies and Entitlements are simple JSON-compatible objects (no functions).You can:store them in a relational DB as JSON columns, write them into KV stores, S3, or files and transfer them between services.
+When loaded, getConditions should rehydrate these objects (if needed) and return Condition ASTs that the AccessControl evaluator runs against the provided evaluation context ({ subject, resource }).
 
-#### Best practices
+### Best practices
 
 - Keep entitlements minimal and referenceable: prefer referencing policy IDs or small condition objects.
 - When adding new operators or facts, update the operator types implementations in src/registry/lib/auth/types.
@@ -168,9 +171,10 @@ When loaded, getConditions should rehydrate these objects (if needed) and return
 - Normalize entitlements in your DB into relations/collections such as entitlements, policies, and conditions. Store conditions as small JSON blobs referenced by policies so, at retrieval time, you can query only the subset of policies/conditions relevant to the requested action/resource/subject. This reduces rows read and the number of conditions evaluated, improving performance and cost.
 
 
-#### Appendix: where to look in code
+### Appendix: where to look in code
 
-Condition AST shape and allowed operators: src/registry/lib/auth/types/condition.ts
-Policy & Entitlement types: src/registry/lib/auth/types/policy.ts, entitlement.ts
-AccessControl runtime and evaluator: src/registry/lib/auth/abac.ts
-This registry is designed so you can persist human-readable, serializable entitlement objects and evaluate them in a type-safe manner at runtime.
+**Condition AST shape and allowed operators:** `src/registry/lib/auth/types/operator.ts`
+**Policy & Entitlement types:** `src/registry/lib/auth/types/policy.ts, entitlement.ts`
+**AccessControl runtime and evaluator:** `src/registry/lib/auth/abac.ts, eval.ts`
+
+_This registry is designed so you can persist human-readable, serializable entitlement objects and evaluate them in a type-safe manner at runtime._
