@@ -173,8 +173,8 @@ When loaded, getConditions should rehydrate these objects (if needed) and return
 
 ### Appendix: where to look in code
 
-**Condition AST shape and allowed operators:** `src/registry/lib/auth/types/operator.ts`
-**Policy & Entitlement types:** `src/registry/lib/auth/types/policy.ts, entitlement.ts`
+**Condition AST shape and allowed operators:** `src/registry/lib/auth/types/operator.ts`  
+**Policy & Entitlement types:** `src/registry/lib/auth/types/policy.ts, entitlement.ts`  
 **AccessControl runtime and evaluator:** `src/registry/lib/auth/abac.ts, eval.ts`
 
 _This registry is designed so you can persist human-readable, serializable entitlement objects and evaluate them in a type-safe manner at runtime._
