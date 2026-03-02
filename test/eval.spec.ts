@@ -350,7 +350,7 @@ describe("evaluateCondition", () => {
 		);
 	});
 
-	it("returns undefined when path does not exist", () => {
+	it("throws for non existent path ", () => {
 		const condition = {
 			kind: "all",
 			all: [
@@ -361,11 +361,30 @@ describe("evaluateCondition", () => {
 				},
 			],
 		} as const;
+		//@ts-expect-error
+		expect(() => evaluateCondition(condition, { subject: { id: 1 } })).toThrow(
+			/Path doesn't exists/,
+		);
+	});
+
+	it("throws for non existent value-path ", () => {
+		const condition = {
+			kind: "all",
+			all: [
+				{
+					path: "$.subject.id",
+					operator: "equal",
+					value: "$.subject.id.abc",
+				},
+			],
+		} as const;
 		// subject has no 'nonexistent' property, so resolvePath returns undefined
 		//@ts-expect-error
-		const result = evaluateCondition(condition, { subject: { id: 1 } });
-		expect(result).toBe(false);
+		expect(() => evaluateCondition(condition, { subject: { id: 1 } })).toThrow(
+			/Path doesn't exists/,
+		);
 	});
+
 	it("returns false for wrong condition type", () => {
 		const condition = {
 			kind: "none",
