@@ -29,10 +29,13 @@ function resolvePath(context: BaseContext, path: string): unknown {
 // Evaluator for a single ConditionNode
 function evaluateNode(node: BaseNode, context: BaseContext): boolean {
 	const left = resolvePath(context, node.path);
-	const right =
-		typeof node.value === "string" && node.value.startsWith("$.")
-			? resolvePath(context, node.value)
-			: node.value;
+	if (!left) throw new Error(`Path doesn't exists: ${node.path}`);
+	let right: unknown;
+	if (typeof node.value === "string" && node.value.startsWith("$.")) {
+		right = resolvePath(context, node.value);
+		if (right === undefined)
+			throw new Error(`Path doesn't exists: ${node.value}`);
+	} else right = node.value;
 	const operator = node.operator;
 	const now = Date.now();
 	switch (operator) {
