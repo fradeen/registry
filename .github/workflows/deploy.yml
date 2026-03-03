@@ -34,12 +34,17 @@ jobs:
           echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
 
-      - name: Create Git tag
-        run: | 
-          git config user.name "github-actions[bot]" 
+      - name: Create Git tag if not exists
+        run: |
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag v${{ steps.pkg.outputs.version }}
-          git push origin v${{ steps.pkg.outputs.version }}
+          TAG="v${{ steps.pkg.outputs.version }}"
+          if git ls-remote --tags origin | grep -q "refs/tags/$TAG"; then
+            echo "Tag $TAG already exists. Skipping."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
 
       - name: Publish with Wrangler
         uses: cloudflare/wrangler-action@v3
