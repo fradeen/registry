@@ -18,6 +18,7 @@
 			"name": "npm"
 		}
 	},
+	"packageManager": "npm@11.8.0",
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.14",
 		"@edge-runtime/vm": "^5.0.0",
