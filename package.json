@@ -24,7 +24,7 @@
 		"@edge-runtime/vm": "^5.0.0",
 		"@types/lodash": "^4.17.23",
 		"@vitest/coverage-v8": "^4.0.18",
-		"shadcn": "^3.8.4",
+		"shadcn": "^3.8.5",
 		"vitest": "^4.0.18",
 		"wrangler": "^4.64.0"
 	},
