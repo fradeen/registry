@@ -5,6 +5,7 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    target-branch: "dev"
     groups:
       # Name the group (this will appear in the PR title)
       all-minor-and-patch-updates:
@@ -17,3 +18,4 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    target-branch: "dev"
