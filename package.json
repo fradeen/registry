@@ -26,7 +26,7 @@
 		"@vitest/coverage-v8": "^4.0.18",
 		"shadcn": "^3.8.5",
 		"vitest": "^4.0.18",
-		"wrangler": "^4.69.0"
+		"wrangler": "^4.70.0"
 	},
 	"dependencies": {
 		"lodash": "^4.17.23"
