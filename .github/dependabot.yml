@@ -12,6 +12,10 @@ updates:
         update-types:
           - "patch"
           - "minor"
+      all-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
