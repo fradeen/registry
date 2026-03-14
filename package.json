@@ -20,13 +20,13 @@
 	},
 	"packageManager": "npm@11.8.0",
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.5",
+		"@biomejs/biome": "^2.4.7",
 		"@edge-runtime/vm": "^5.0.0",
 		"@types/lodash": "^4.17.24",
-		"@vitest/coverage-v8": "^4.0.18",
+		"@vitest/coverage-v8": "^4.1.0",
 		"shadcn": "^3.8.5",
 		"vitest": "^4.0.18",
-		"wrangler": "^4.69.0"
+		"wrangler": "^4.73.0"
 	},
 	"dependencies": {
 		"lodash": "^4.17.23"
