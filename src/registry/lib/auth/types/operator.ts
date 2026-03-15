@@ -1,3 +1,21 @@
+export const OPERATORS = [
+	"equal",
+	"notEqual",
+	"greaterThan",
+	"greaterThanInclusive",
+	"lessThan",
+	"lessThanInclusive",
+	"elapsedGreaterThan",
+	"elapsedGreaterThanInclusive",
+	"elapsedLessThan",
+	"elapsedLessThanInclusive",
+	"remainingGreaterThan",
+	"remainingGreaterThanInclusive",
+	"remainingLessThan",
+	"remainingLessThanInclusive",
+	"includes",
+	"in",
+] as const;
 type BaseOperators = "equal" | "notEqual";
 
 type StringOperators = BaseOperators;

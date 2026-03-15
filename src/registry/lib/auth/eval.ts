@@ -1,16 +1,10 @@
 import includes from "lodash/includes";
 import isEqual from "lodash/isEqual";
+import type {
+	BaseCondition,
+	BaseNode,
+} from "@/registry/lib/auth/types/condition";
 
-type BaseNode = { path: string; operator: string; value: unknown };
-type BaseCondition =
-	| {
-			kind: "all";
-			all: (BaseNode | BaseCondition)[];
-	  }
-	| {
-			kind: "any";
-			any: (BaseNode | BaseCondition)[];
-	  };
 type BaseContext = {
 	subject: Record<string, unknown>;
 	resource?: Record<string, unknown>;
@@ -90,5 +84,7 @@ export function evaluateCondition(
 		return condition.any.some((c) =>
 			"kind" in c ? evaluateCondition(c, context) : evaluateNode(c, context),
 		);
+	} else if (condition.kind === "node") {
+		return evaluateNode(condition, context);
 	} else return false;
 }

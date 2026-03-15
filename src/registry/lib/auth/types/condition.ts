@@ -1,8 +1,27 @@
-import type { OperatorForRelation } from "@/registry/lib/auth/types/operator";
+import type {
+	OPERATORS,
+	OperatorForRelation,
+} from "@/registry/lib/auth/types/operator";
 import type { AuthContext } from "@/registry/lib/auth/types/policy";
 import type { BaseResource } from "@/registry/lib/auth/types/resource";
 import type { BaseSubject } from "@/registry/lib/auth/types/subject";
 
+export type BaseNode = {
+	kind: "node";
+	path: string;
+	operator: (typeof OPERATORS)[number];
+	value: unknown;
+};
+export type BaseCondition =
+	| {
+			kind: "all";
+			all: (BaseNode | BaseCondition)[];
+	  }
+	| {
+			kind: "any";
+			any: (BaseNode | BaseCondition)[];
+	  }
+	| BaseNode;
 type Primitive = string | boolean | number | bigint;
 
 type DotPathMap<T, Prefix extends string = ""> = {
@@ -37,11 +56,13 @@ export type ConditionNode<
 		? {
 				[K in P as K["path"]]: //literal values
 					| {
+							kind: "node";
 							path: `$.${K["path"]}`;
 							operator: OperatorForRelation<K["type"], K["type"]>;
 							value: K["type"];
 					  }
 					| {
+							kind: "node";
 							path: `$.${K["path"]}`;
 							operator: OperatorForRelation<K["type"], ElementType<K["type"]>>;
 							value: ElementType<K["type"]> extends Date
@@ -49,6 +70,7 @@ export type ConditionNode<
 								: ElementType<K["type"]>;
 					  }
 					| {
+							kind: "node";
 							path: `$.${K["path"]}`;
 							operator: OperatorForRelation<
 								K["type"],
@@ -58,16 +80,19 @@ export type ConditionNode<
 					  }
 					// value by path
 					| {
+							kind: "node";
 							path: `$.${K["path"]}`;
 							operator: OperatorForRelation<K["type"], K["type"]>;
 							value: `$.${Exclude<Extract<P, { type: K["type"] }>["path"], K["path"]>}`;
 					  }
 					| {
+							kind: "node";
 							path: `$.${K["path"]}`;
 							operator: OperatorForRelation<K["type"], ElementType<K["type"]>>;
 							value: `$.${Exclude<Extract<P, { type: ElementType<K["type"]> }>["path"], K["path"]>}`;
 					  }
 					| {
+							kind: "node";
 							path: `$.${K["path"]}`;
 							operator: OperatorForRelation<
 								K["type"],
@@ -96,4 +121,5 @@ export type Condition<
 				| ConditionNode<S, Resource, RequiresResource>
 				| Condition<S, Resource, RequiresResource>
 			)[];
-	  };
+	  }
+	| ConditionNode<S, Resource, RequiresResource>;
