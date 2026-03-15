@@ -94,18 +94,21 @@ const entitlement = {
 				any: [
 					// serialized condition: subject.id == resource.ownerId
 					{
+						kind: "node",
 						path: "$.subject.id",
 						operator: "equal",
 						value: "$.resource.ownerId",
 					},
 					// serialized condition: subject.id in editors list.
 					{
+						kind: "node",
 						path: "$.subject.id",
 						operator: "in",
 						value: "$.resource.editors",
 					},
 					// serialized condition: subject.role === admin.
 					{
+						kind: "node",
 						path: "$.subject.role",
 						operator: "equal",
 						value: "admin",
@@ -120,6 +123,7 @@ const entitlement = {
 				all: [
 					// comparison with literal values
 					{
+						kind: "node",
 						path: "$.resource.published",
 						operator: "equal",
 						value: true,
