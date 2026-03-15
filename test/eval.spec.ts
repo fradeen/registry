@@ -32,6 +32,7 @@ function ctx<
 describe("evaluateCondition", () => {
 	it("evaluates 'equal' and 'notEqual' operators", () => {
 		const node1: ConditionNode<User, Doc, true> = {
+			kind: "node",
 			path: "$.subject.id",
 			operator: "equal",
 			value: 5,
@@ -45,6 +46,7 @@ describe("evaluateCondition", () => {
 		expect(evaluateCondition(cond1, ctx({ id: 7 }))).toBe(false);
 
 		const node2: ConditionNode<User, Doc, true> = {
+			kind: "node",
 			path: "$.subject.name",
 			operator: "notEqual",
 			value: "bob",
@@ -59,6 +61,7 @@ describe("evaluateCondition", () => {
 
 	it("evaluates numeric comparison operators", () => {
 		const node: ConditionNode<User, Doc, true> = {
+			kind: "node",
 			path: "$.subject.age",
 			value: 18,
 			operator: "greaterThan",
@@ -91,6 +94,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.subject.createdAt",
 					operator: "elapsedGreaterThan",
 					value: 1000 * 60 * 5,
@@ -105,6 +109,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.subject.createdAt",
 					operator: "elapsedGreaterThanInclusive",
 					value: 1000 * 60 * 10,
@@ -119,6 +124,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.subject.createdAt",
 					operator: "elapsedLessThan",
 					value: 1000 * 60 * 5,
@@ -133,6 +139,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.subject.createdAt",
 					operator: "elapsedLessThanInclusive",
 					value: 1000 * 60 * 10,
@@ -147,6 +154,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.resource.expiresAt",
 					operator: "remainingLessThan",
 					value: 1000 * 60 * 15,
@@ -165,6 +173,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.resource.expiresAt",
 					operator: "remainingLessThanInclusive",
 					value: 1000 * 60 * 10,
@@ -183,6 +192,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.resource.expiresAt",
 					operator: "remainingGreaterThan",
 					value: 1000 * 60 * 5,
@@ -207,6 +217,7 @@ describe("evaluateCondition", () => {
 			kind: "all",
 			all: [
 				{
+					kind: "node",
 					path: "$.resource.expiresAt",
 					operator: "remainingGreaterThanInclusive",
 					value: 1000 * 60 * 20,
@@ -223,6 +234,7 @@ describe("evaluateCondition", () => {
 
 	it("evaluates array operators 'includes' and 'in'", () => {
 		const includesNode: ConditionNode<User, Doc, true> = {
+			kind: "node",
 			path: "$.resource.auditors",
 			operator: "includes",
 			value: "$.subject.id",
@@ -239,6 +251,7 @@ describe("evaluateCondition", () => {
 		).toBe(false);
 
 		const inNode: ConditionNode<User, Doc, true> = {
+			kind: "node",
 			path: "$.subject.name",
 			operator: "in",
 			value: ["alice", "bob"],
@@ -253,6 +266,7 @@ describe("evaluateCondition", () => {
 
 	it("resolves right-hand side as path if value is a path", () => {
 		const node: ConditionNode<User, Doc, true> = {
+			kind: "node",
 			path: "$.subject.id",
 			operator: "equal",
 			value: "$.resource.ownerId",
@@ -269,12 +283,45 @@ describe("evaluateCondition", () => {
 		);
 	});
 
+	it("evaluates single node condition", () => {
+		const node: ConditionNode<User, Doc, true> = {
+			kind: "node",
+			path: "$.subject.id",
+			operator: "equal",
+			value: 5,
+		};
+
+		expect(evaluateCondition(node, ctx({ id: 5 }))).toBe(true);
+		expect(evaluateCondition(node, ctx({ id: 7 }))).toBe(false);
+	});
+
+	it("evaluates without kind property present in the node ", () => {
+		//@ts-expect-error
+		const node1: ConditionNode<User, Doc, true> = {
+			path: "$.subject.id",
+			operator: "equal",
+			value: 5,
+		};
+		const cond = {
+			kind: "all",
+			all: [node1],
+		} satisfies Condition<User, Doc, true>;
+
+		expect(evaluateCondition(cond, ctx({ id: 5 }))).toBe(true);
+		expect(evaluateCondition(cond, ctx({ id: 7 }))).toBe(false);
+	});
+
 	it("evaluates 'all' and 'any' condition trees", () => {
 		const allCond: Condition<User, Doc, true> = {
 			kind: "all",
 			all: [
-				{ path: "$.subject.id", operator: "equal", value: 1 },
-				{ path: "$.resource.ownerId", operator: "equal", value: 1 },
+				{ kind: "node", path: "$.subject.id", operator: "equal", value: 1 },
+				{
+					kind: "node",
+					path: "$.resource.ownerId",
+					operator: "equal",
+					value: 1,
+				},
 			],
 		};
 		expect(evaluateCondition(allCond, ctx({ id: 1 }, { ownerId: 1 }))).toBe(
@@ -287,13 +334,23 @@ describe("evaluateCondition", () => {
 		const anyCond: Condition<User, Doc, true> = {
 			kind: "any",
 			any: [
-				{ path: "$.subject.id", operator: "equal", value: 2 },
-				{ path: "$.resource.ownerId", operator: "equal", value: 1 },
+				{ kind: "node", path: "$.subject.id", operator: "equal", value: 2 },
+				{
+					kind: "node",
+					path: "$.resource.ownerId",
+					operator: "equal",
+					value: 1,
+				},
 				{
 					kind: "any",
 					any: [
-						{ path: "$.subject.id", operator: "equal", value: 2 },
-						{ path: "$.resource.ownerId", operator: "equal", value: 1 },
+						{ kind: "node", path: "$.subject.id", operator: "equal", value: 2 },
+						{
+							kind: "node",
+							path: "$.resource.ownerId",
+							operator: "equal",
+							value: 1,
+						},
 					],
 				},
 			],
@@ -316,11 +373,16 @@ describe("evaluateCondition", () => {
 				{
 					kind: "any",
 					any: [
-						{ path: "$.subject.id", operator: "equal", value: 1 },
-						{ path: "$.subject.id", operator: "equal", value: 2 },
+						{ kind: "node", path: "$.subject.id", operator: "equal", value: 1 },
+						{ kind: "node", path: "$.subject.id", operator: "equal", value: 2 },
 					],
 				},
-				{ path: "$.resource.ownerId", operator: "equal", value: 1 },
+				{
+					kind: "node",
+					path: "$.resource.ownerId",
+					operator: "equal",
+					value: 1,
+				},
 			],
 		};
 		expect(evaluateCondition(nested, ctx({ id: 1 }, { ownerId: 1 }))).toBe(
