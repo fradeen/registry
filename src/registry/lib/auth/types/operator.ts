@@ -1,11 +1,11 @@
-const BASE_OPERATORS = ["equal", "notEqual"] as const;
+export const BASE_OPERATORS = ["equal", "notEqual"] as const;
 type BaseOperators = (typeof BASE_OPERATORS)[number];
 
 type StringOperators = BaseOperators;
 type BooleanOperators = BaseOperators;
 type ArrayOperators = BaseOperators;
 
-const NUMBER_OPERATORS = [
+export const NUMBER_OPERATORS = [
 	...BASE_OPERATORS,
 	"greaterThan",
 	"greaterThanInclusive",
@@ -14,7 +14,7 @@ const NUMBER_OPERATORS = [
 ] as const;
 type NumberOperators = (typeof NUMBER_OPERATORS)[number];
 
-const DATE_OPERATORS = [
+export const DATE_OPERATORS = [
 	...NUMBER_OPERATORS,
 	"elapsedGreaterThan",
 	"elapsedGreaterThanInclusive",
@@ -27,7 +27,7 @@ const DATE_OPERATORS = [
 ] as const;
 type DateOperators = (typeof DATE_OPERATORS)[number];
 
-const MEMBERSHIP_OPERATORS = ["includes", "in"] as const;
+export const MEMBERSHIP_OPERATORS = ["includes", "in"] as const;
 type MembershipOperators = (typeof MEMBERSHIP_OPERATORS)[number];
 
 export const OPERATORS = [
