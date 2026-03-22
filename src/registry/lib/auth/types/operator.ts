@@ -1,10 +1,21 @@
-export const OPERATORS = [
-	"equal",
-	"notEqual",
+const BASE_OPERATORS = ["equal", "notEqual"] as const;
+type BaseOperators = (typeof BASE_OPERATORS)[number];
+
+type StringOperators = BaseOperators;
+type BooleanOperators = BaseOperators;
+type ArrayOperators = BaseOperators;
+
+const NUMBER_OPERATORS = [
+	...BASE_OPERATORS,
 	"greaterThan",
 	"greaterThanInclusive",
 	"lessThan",
 	"lessThanInclusive",
+] as const;
+type NumberOperators = (typeof NUMBER_OPERATORS)[number];
+
+const DATE_OPERATORS = [
+	...NUMBER_OPERATORS,
 	"elapsedGreaterThan",
 	"elapsedGreaterThanInclusive",
 	"elapsedLessThan",
@@ -13,36 +24,18 @@ export const OPERATORS = [
 	"remainingGreaterThanInclusive",
 	"remainingLessThan",
 	"remainingLessThanInclusive",
-	"includes",
-	"in",
 ] as const;
-type BaseOperators = "equal" | "notEqual";
+type DateOperators = (typeof DATE_OPERATORS)[number];
 
-type StringOperators = BaseOperators;
+const MEMBERSHIP_OPERATORS = ["includes", "in"] as const;
+type MembershipOperators = (typeof MEMBERSHIP_OPERATORS)[number];
 
-type NumberOperators =
-	| BaseOperators
-	| "greaterThan"
-	| "greaterThanInclusive"
-	| "lessThan"
-	| "lessThanInclusive";
-
-type BooleanOperators = BaseOperators;
-
-type DateOperators =
-	| NumberOperators
-	| "elapsedGreaterThan"
-	| "elapsedGreaterThanInclusive"
-	| "elapsedLessThan"
-	| "elapsedLessThanInclusive"
-	| "remainingGreaterThan"
-	| "remainingGreaterThanInclusive"
-	| "remainingLessThan"
-	| "remainingLessThanInclusive";
-
-type ArrayOperators = BaseOperators;
-
-type MembershipOperators = "includes" | "in";
+export const OPERATORS = [
+	...BASE_OPERATORS,
+	...NUMBER_OPERATORS,
+	...DATE_OPERATORS,
+	...MEMBERSHIP_OPERATORS,
+] as const;
 
 type OperatorFor<T> = T extends string
 	? StringOperators

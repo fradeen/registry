@@ -2,7 +2,7 @@ import includes from "lodash/includes";
 import isEqual from "lodash/isEqual";
 import type {
 	BaseCondition,
-	BaseNode,
+	BaseConditionNode,
 } from "@/registry/lib/auth/types/condition";
 
 type BaseContext = {
@@ -21,9 +21,9 @@ function resolvePath(context: BaseContext, path: string): unknown {
 }
 
 // Evaluator for a single ConditionNode
-function evaluateNode(node: BaseNode, context: BaseContext): boolean {
+function evaluateNode(node: BaseConditionNode, context: BaseContext): boolean {
 	const left = resolvePath(context, node.path);
-	if (!left) throw new Error(`Path doesn't exists: ${node.path}`);
+	if (left === undefined) throw new Error(`Path doesn't exists: ${node.path}`);
 	let right: unknown;
 	if (typeof node.value === "string" && node.value.startsWith("$.")) {
 		right = resolvePath(context, node.value);

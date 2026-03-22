@@ -6,7 +6,9 @@ import type { AuthContext } from "@/registry/lib/auth/types/policy";
 import type { BaseResource } from "@/registry/lib/auth/types/resource";
 import type { BaseSubject } from "@/registry/lib/auth/types/subject";
 
-export type BaseNode = {
+type Primitive = string | boolean | number | bigint;
+
+export type BaseConditionNode = {
 	kind: "node";
 	path: string;
 	operator: (typeof OPERATORS)[number];
@@ -15,14 +17,13 @@ export type BaseNode = {
 export type BaseCondition =
 	| {
 			kind: "all";
-			all: (BaseNode | BaseCondition)[];
+			all: (BaseConditionNode | BaseCondition)[];
 	  }
 	| {
 			kind: "any";
-			any: (BaseNode | BaseCondition)[];
+			any: (BaseConditionNode | BaseCondition)[];
 	  }
-	| BaseNode;
-type Primitive = string | boolean | number | bigint;
+	| BaseConditionNode;
 
 type DotPathMap<T, Prefix extends string = ""> = {
 	[K in keyof T & string]-?: NonNullable<T[K]> extends Primitive
