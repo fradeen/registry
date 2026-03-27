@@ -2,8 +2,9 @@ import includes from "lodash/includes";
 import isEqual from "lodash/isEqual";
 import type {
 	BaseCondition,
-	BaseNode,
+	BaseConditionNode,
 } from "@/registry/lib/auth/types/condition";
+import { NUMBER_OPERATORS } from "@/registry/lib/auth/types/operator";
 
 type BaseContext = {
 	subject: Record<string, unknown>;
@@ -20,10 +21,36 @@ function resolvePath(context: BaseContext, path: string): unknown {
 	}, context);
 }
 
+function getType(val: unknown) {
+	if (
+		val instanceof Date ||
+		(Object.prototype.toString.call(val) === "[object Date]" &&
+			!Number.isNaN(val))
+	)
+		return "date";
+	if (Array.isArray(val)) return "array";
+	return typeof val;
+}
+
+function isOperatorCompatible(
+	operator: string,
+	left: string,
+	right: string,
+): boolean {
+	if (operator === "equal" || operator === "notEqual") return true;
+	if (operator.startsWith("remaining") || operator.startsWith("elapsed"))
+		return left === "date" && right === "number";
+	if ((NUMBER_OPERATORS as readonly string[]).includes(operator))
+		return ["number", "bigint", "date"].includes(left) && left === right;
+	if (operator === "includes") return left === "array";
+	if (operator === "in") return right === "array";
+	return false;
+}
+
 // Evaluator for a single ConditionNode
-function evaluateNode(node: BaseNode, context: BaseContext): boolean {
+function evaluateNode(node: BaseConditionNode, context: BaseContext): boolean {
 	const left = resolvePath(context, node.path);
-	if (!left) throw new Error(`Path doesn't exists: ${node.path}`);
+	if (left === undefined) throw new Error(`Path doesn't exists: ${node.path}`);
 	let right: unknown;
 	if (typeof node.value === "string" && node.value.startsWith("$.")) {
 		right = resolvePath(context, node.value);
@@ -32,6 +59,13 @@ function evaluateNode(node: BaseNode, context: BaseContext): boolean {
 	} else right = node.value;
 	const operator = node.operator;
 	const now = Date.now();
+	const leftType = getType(left);
+	const rightType = getType(right);
+	if (!isOperatorCompatible(operator, leftType, rightType)) {
+		throw new Error(
+			`Unsupported operator: ${operator}, not valid for left=${leftType}, right=${rightType}`,
+		);
+	}
 	switch (operator) {
 		case "equal":
 			return isEqual(left, right);
@@ -67,7 +101,9 @@ function evaluateNode(node: BaseNode, context: BaseContext): boolean {
 		case "in":
 			return Array.isArray(right) && includes(right, left);
 		default:
-			throw new Error(`Unsupported operator: ${operator}`);
+			throw new Error(
+				`Unsupported operator: ${operator}, not valid for left=${leftType}, right=${rightType}`,
+			);
 	}
 }
 
