@@ -28,6 +28,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run Biome check
+        run: npx biome check 
+
+      - name: Run build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
       - name: Get package version
         id: pkg
         run: |
@@ -35,18 +44,23 @@ jobs:
 
 
       - name: Create Git tag if not exists
+        id: create_tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           TAG="v${{ steps.pkg.outputs.version }}"
           if git ls-remote --tags origin | grep -q "refs/tags/$TAG"; then
+            echo "created=false" >> $GITHUB_OUTPUT
             echo "Tag $TAG already exists. Skipping."
           else
             git tag "$TAG"
             git push origin "$TAG"
+            echo "created=true" >> $GITHUB_OUTPUT
           fi
 
+
       - name: Publish with Wrangler
+        if: steps.create_tag.outputs.created == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
