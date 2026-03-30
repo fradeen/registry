@@ -16,6 +16,10 @@
 					"type": "registry:lib"
 				},
 				{
+					"path": "src/registry/lib/auth/error.ts",
+					"type": "registry:lib"
+				},
+				{
 					"path": "src/registry/lib/auth/eval.ts",
 					"type": "registry:lib"
 				},

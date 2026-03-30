@@ -1,3 +1,4 @@
+import { AuthError } from "@/registry/lib/auth/error";
 import { evaluateCondition } from "@/registry/lib/auth/eval";
 import type { Condition } from "@/registry/lib/auth/types/condition";
 import type { BaseResource } from "@/registry/lib/auth/types/resource";
@@ -49,7 +50,7 @@ export class AccessControl<
 				!(typeof resource === "string"),
 			);
 			if (!conditions.length)
-				throw new Error(
+				throw new AuthError(
 					"No conditions/policies found for subject, resource/resource-type combo.",
 				);
 			const context =

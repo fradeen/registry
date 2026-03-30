@@ -447,6 +447,24 @@ describe("evaluateCondition", () => {
 		);
 	});
 
+	it("throws for value-path resolved to undefined", () => {
+		const condition = {
+			kind: "all",
+			all: [
+				{
+					path: "$.subject.id",
+					operator: "equal",
+					value: "$.subject.abc",
+				},
+			],
+		} as const;
+		// subject has no 'nonexistent' property, so resolvePath returns undefined
+		expect(() =>
+			//@ts-expect-error
+			evaluateCondition(condition, { subject: { id: 1, abc: undefined } }),
+		).toThrow(/Value-path resolved to undefined/);
+	});
+
 	it("returns false for wrong condition type", () => {
 		const condition = {
 			kind: "none",
