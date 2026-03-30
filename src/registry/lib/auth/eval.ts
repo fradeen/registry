@@ -1,5 +1,6 @@
 import includes from "lodash/includes";
 import isEqual from "lodash/isEqual";
+import { AuthError } from "@/registry/lib/auth/error";
 import type {
 	BaseCondition,
 	BaseConditionNode,
@@ -14,10 +15,9 @@ type BaseContext = {
 function resolvePath(context: BaseContext, path: string): unknown {
 	const parts = path.replace(/^\$\./, "").split(".");
 	return parts.reduce<unknown>((acc, key) => {
-		if (acc && typeof acc === "object" && !Array.isArray(acc)) {
-			return (acc as Record<string, unknown>)[key];
-		}
-		return undefined;
+		if (!acc || Array.isArray(acc) || typeof acc !== "object" || !(key in acc))
+			throw new AuthError(`Path doesn't exists: ${path}`);
+		return (acc as Record<string, unknown>)[key];
 	}, context);
 }
 
@@ -50,19 +50,20 @@ function isOperatorCompatible(
 // Evaluator for a single ConditionNode
 function evaluateNode(node: BaseConditionNode, context: BaseContext): boolean {
 	const left = resolvePath(context, node.path);
-	if (left === undefined) throw new Error(`Path doesn't exists: ${node.path}`);
+	// if (left === undefined)
+	// 	throw new AuthError(`Path doesn't exists: ${node.path}`);
 	let right: unknown;
 	if (typeof node.value === "string" && node.value.startsWith("$.")) {
 		right = resolvePath(context, node.value);
 		if (right === undefined)
-			throw new Error(`Path doesn't exists: ${node.value}`);
+			throw new AuthError(`Value-path resolved to undefined: ${node.value}`);
 	} else right = node.value;
 	const operator = node.operator;
 	const now = Date.now();
 	const leftType = getType(left);
 	const rightType = getType(right);
 	if (!isOperatorCompatible(operator, leftType, rightType)) {
-		throw new Error(
+		throw new AuthError(
 			`Unsupported operator: ${operator}, not valid for left=${leftType}, right=${rightType}`,
 		);
 	}
@@ -101,7 +102,7 @@ function evaluateNode(node: BaseConditionNode, context: BaseContext): boolean {
 		case "in":
 			return Array.isArray(right) && includes(right, left);
 		default:
-			throw new Error(
+			throw new AuthError(
 				`Unsupported operator: ${operator}, not valid for left=${leftType}, right=${rightType}`,
 			);
 	}

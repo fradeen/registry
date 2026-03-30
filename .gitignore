@@ -35,3 +35,6 @@ coverage
 # misc
 .DS_Store
 src/registry/lib/auth/test.ts
+
+#
+public/r/*
