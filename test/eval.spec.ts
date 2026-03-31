@@ -39,7 +39,7 @@ describe("evaluateCondition", () => {
 		};
 		const cond1 = {
 			kind: "all",
-			all: [node1],
+			conditions: [node1],
 		} satisfies Condition<User, Doc, true>;
 
 		expect(evaluateCondition(cond1, ctx({ id: 5 }))).toBe(true);
@@ -53,7 +53,7 @@ describe("evaluateCondition", () => {
 		};
 		const cond2 = {
 			kind: "all",
-			all: [node2],
+			conditions: [node2],
 		} satisfies Condition<User, Doc, true>;
 		expect(evaluateCondition(cond2, ctx({ name: "alice" }))).toBe(true);
 		expect(evaluateCondition(cond2, ctx({ name: "bob" }))).toBe(false);
@@ -68,16 +68,17 @@ describe("evaluateCondition", () => {
 		};
 		const condition: Condition<User, Doc, true> = {
 			kind: "all",
-			all: [node],
+			conditions: [node],
 		} satisfies Condition<User, Doc, true>;
 		expect(evaluateCondition(condition, ctx({ age: 20 }))).toBe(true);
-		if ("operator" in condition.all[0])
-			condition.all[0].operator = "greaterThanInclusive";
+		if ("operator" in condition.conditions[0])
+			condition.conditions[0].operator = "greaterThanInclusive";
 		expect(evaluateCondition(condition, ctx({ age: 18 }))).toBe(true);
-		if ("operator" in condition.all[0]) condition.all[0].operator = "lessThan";
+		if ("operator" in condition.conditions[0])
+			condition.conditions[0].operator = "lessThan";
 		expect(evaluateCondition(condition, ctx({ age: 17 }))).toBe(true);
-		if ("operator" in condition.all[0])
-			condition.all[0].operator = "lessThanInclusive";
+		if ("operator" in condition.conditions[0])
+			condition.conditions[0].operator = "lessThanInclusive";
 		expect(evaluateCondition(condition, ctx({ age: 18 }))).toBe(true);
 	});
 
@@ -92,7 +93,7 @@ describe("evaluateCondition", () => {
 		// elapsedGreaterThan
 		const cond1 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.subject.createdAt",
@@ -107,7 +108,7 @@ describe("evaluateCondition", () => {
 		// elapsedGreaterThanInclusive
 		const cond2 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.subject.createdAt",
@@ -122,7 +123,7 @@ describe("evaluateCondition", () => {
 		// elapsedLessThan
 		const cond3 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.subject.createdAt",
@@ -137,7 +138,7 @@ describe("evaluateCondition", () => {
 		// elapsedLessThanInclusive
 		const cond4 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.subject.createdAt",
@@ -152,7 +153,7 @@ describe("evaluateCondition", () => {
 		// remainingLessThan
 		const cond5 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.resource.expiresAt",
@@ -171,7 +172,7 @@ describe("evaluateCondition", () => {
 		// remainingLessThanInclusive
 		const cond6 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.resource.expiresAt",
@@ -190,7 +191,7 @@ describe("evaluateCondition", () => {
 		// remainingGreaterThan
 		const cond7 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.resource.expiresAt",
@@ -215,7 +216,7 @@ describe("evaluateCondition", () => {
 		// remainingGreaterThanInclusive
 		const cond8 = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "node",
 					path: "$.resource.expiresAt",
@@ -241,7 +242,7 @@ describe("evaluateCondition", () => {
 		};
 		const condition1 = {
 			kind: "all",
-			all: [includesNode],
+			conditions: [includesNode],
 		} satisfies Condition<User, Doc, true>;
 		expect(
 			evaluateCondition(condition1, ctx({ id: 1 }, { auditors: [1] })),
@@ -258,7 +259,7 @@ describe("evaluateCondition", () => {
 		};
 		const condition2 = {
 			kind: "all",
-			all: [inNode],
+			conditions: [inNode],
 		} satisfies Condition<User, Doc, true>;
 		expect(evaluateCondition(condition2, ctx({ name: "alice" }))).toBe(true);
 		expect(evaluateCondition(condition2, ctx({ name: "carol" }))).toBe(false);
@@ -273,7 +274,7 @@ describe("evaluateCondition", () => {
 		};
 		const condition: Condition<User, Doc, true> = {
 			kind: "all",
-			all: [node],
+			conditions: [node],
 		};
 		expect(evaluateCondition(condition, ctx({ id: 42 }, { ownerId: 42 }))).toBe(
 			true,
@@ -304,7 +305,7 @@ describe("evaluateCondition", () => {
 		};
 		const cond = {
 			kind: "all",
-			all: [node1],
+			conditions: [node1],
 		} satisfies Condition<User, Doc, true>;
 
 		expect(evaluateCondition(cond, ctx({ id: 5 }))).toBe(true);
@@ -314,7 +315,7 @@ describe("evaluateCondition", () => {
 	it("evaluates 'all' and 'any' condition trees", () => {
 		const allCond: Condition<User, Doc, true> = {
 			kind: "all",
-			all: [
+			conditions: [
 				{ kind: "node", path: "$.subject.id", operator: "equal", value: 1 },
 				{
 					kind: "node",
@@ -333,7 +334,7 @@ describe("evaluateCondition", () => {
 
 		const anyCond: Condition<User, Doc, true> = {
 			kind: "any",
-			any: [
+			conditions: [
 				{ kind: "node", path: "$.subject.id", operator: "equal", value: 2 },
 				{
 					kind: "node",
@@ -343,7 +344,7 @@ describe("evaluateCondition", () => {
 				},
 				{
 					kind: "any",
-					any: [
+					conditions: [
 						{ kind: "node", path: "$.subject.id", operator: "equal", value: 2 },
 						{
 							kind: "node",
@@ -369,10 +370,10 @@ describe("evaluateCondition", () => {
 	it("supports nested condition trees", () => {
 		const nested: Condition<User, Doc, true> = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					kind: "any",
-					any: [
+					conditions: [
 						{ kind: "node", path: "$.subject.id", operator: "equal", value: 1 },
 						{ kind: "node", path: "$.subject.id", operator: "equal", value: 2 },
 					],
@@ -405,7 +406,7 @@ describe("evaluateCondition", () => {
 		};
 		const condition: Condition<User, Doc, true> = {
 			kind: "all",
-			all: [node],
+			conditions: [node],
 		};
 		expect(() => evaluateCondition(condition, ctx({ id: 1 }))).toThrow(
 			/Unsupported operator/,
@@ -415,7 +416,7 @@ describe("evaluateCondition", () => {
 	it("throws for non existent path ", () => {
 		const condition = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					path: "$.subject.id.nonexistent",
 					operator: "equal",
@@ -432,7 +433,7 @@ describe("evaluateCondition", () => {
 	it("throws for non existent value-path ", () => {
 		const condition = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					path: "$.subject.id",
 					operator: "equal",
@@ -450,7 +451,7 @@ describe("evaluateCondition", () => {
 	it("throws for value-path resolved to undefined", () => {
 		const condition = {
 			kind: "all",
-			all: [
+			conditions: [
 				{
 					path: "$.subject.id",
 					operator: "equal",
@@ -468,7 +469,7 @@ describe("evaluateCondition", () => {
 	it("returns false for wrong condition type", () => {
 		const condition = {
 			kind: "none",
-			all: [
+			conditions: [
 				{
 					path: "$.subject.id.nonexistent",
 					operator: "equal",

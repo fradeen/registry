@@ -114,11 +114,11 @@ export function evaluateCondition(
 	context: BaseContext,
 ): boolean {
 	if (condition.kind === "all") {
-		return condition.all.every((c) =>
+		return condition.conditions.every((c) =>
 			"kind" in c ? evaluateCondition(c, context) : evaluateNode(c, context),
 		);
 	} else if (condition.kind === "any") {
-		return condition.any.some((c) =>
+		return condition.conditions.some((c) =>
 			"kind" in c ? evaluateCondition(c, context) : evaluateNode(c, context),
 		);
 	} else if (condition.kind === "node") {

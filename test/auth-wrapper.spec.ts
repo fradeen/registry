@@ -32,7 +32,9 @@ describe("AuthWrapper", () => {
 		mockGetConditions.mockResolvedValueOnce([
 			{
 				kind: "all",
-				all: [{ path: "$.subject.role", operator: "equal", value: "admin" }],
+				conditions: [
+					{ path: "$.subject.role", operator: "equal", value: "admin" },
+				],
 			},
 		]);
 		const fnWithoutResource = (message: string) => {
@@ -54,7 +56,7 @@ describe("AuthWrapper", () => {
 		mockGetConditions.mockResolvedValueOnce([
 			{
 				kind: "all",
-				all: [
+				conditions: [
 					{
 						path: "$.subject.id",
 						operator: "equal",
@@ -81,7 +83,7 @@ describe("AuthWrapper", () => {
 		mockGetConditions.mockResolvedValueOnce([
 			{
 				kind: "all",
-				all: [
+				conditions: [
 					{
 						path: "$.subject.id",
 						operator: "equal",
@@ -112,7 +114,7 @@ describe("AuthWrapper", () => {
 		mockGetConditions.mockResolvedValueOnce([
 			{
 				kind: "all",
-				all: [
+				conditions: [
 					{
 						path: "$.subject.id",
 						operator: "notEqual",

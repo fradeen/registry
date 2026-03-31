@@ -47,7 +47,9 @@ describe("AccessControl", () => {
 		mockGetConditions.mockResolvedValueOnce([
 			{
 				kind: "all",
-				all: [{ path: "$.subject.role", operator: "equal", value: "admin" }],
+				conditions: [
+					{ path: "$.subject.role", operator: "equal", value: "admin" },
+				],
 			},
 		]);
 		const result = await ac.can(subject).read(resource);
@@ -58,7 +60,9 @@ describe("AccessControl", () => {
 		mockGetConditions.mockResolvedValueOnce([
 			{
 				kind: "any",
-				any: [{ path: "$.subject.role", operator: "equal", value: "admin" }],
+				conditions: [
+					{ path: "$.subject.role", operator: "equal", value: "admin" },
+				],
 			},
 		]);
 		const result = await ac.can(subject).read("doc");
@@ -69,7 +73,9 @@ describe("AccessControl", () => {
 		mockGetConditions.mockResolvedValueOnce([
 			{
 				kind: "all",
-				all: [{ path: "$.subject.role", operator: "equal", value: "user" }],
+				conditions: [
+					{ path: "$.subject.role", operator: "equal", value: "user" },
+				],
 			},
 		]);
 		const result = await ac.can(subject).write(resource);
