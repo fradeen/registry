@@ -17,11 +17,11 @@ export type BaseConditionNode = {
 export type BaseCondition =
 	| {
 			kind: "all";
-			all: (BaseConditionNode | BaseCondition)[];
+			conditions: (BaseConditionNode | BaseCondition)[];
 	  }
 	| {
 			kind: "any";
-			any: (BaseConditionNode | BaseCondition)[];
+			conditions: (BaseConditionNode | BaseCondition)[];
 	  }
 	| BaseConditionNode;
 
@@ -111,14 +111,14 @@ export type Condition<
 > =
 	| {
 			kind: "all";
-			all: (
+			conditions: (
 				| ConditionNode<S, Resource, RequiresResource>
 				| Condition<S, Resource, RequiresResource>
 			)[];
 	  }
 	| {
 			kind: "any";
-			any: (
+			conditions: (
 				| ConditionNode<S, Resource, RequiresResource>
 				| Condition<S, Resource, RequiresResource>
 			)[];
