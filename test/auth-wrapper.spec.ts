@@ -149,7 +149,7 @@ describe("AuthWrapper", () => {
 		const fnWithoutResource = (message: string) => {
 			return message;
 		};
-		mockGetUser.mockResolvedValueOnce(subject)
+		mockGetUser.mockResolvedValueOnce(subject);
 		const wrappedFn = withAuth({
 			subject: mockGetUser,
 			ac: ac,
@@ -176,7 +176,7 @@ describe("AuthWrapper", () => {
 				],
 			},
 		]);
-		mockGetUser.mockResolvedValueOnce(undefined)
+		mockGetUser.mockResolvedValueOnce(undefined);
 		const fnWithResource = (resource: TestResource) => {
 			return resource.ownerId;
 		};
@@ -187,7 +187,8 @@ describe("AuthWrapper", () => {
 			extractResource: true,
 			fn: fnWithResource,
 		});
-		await expect(wrappedFn1(resource)).rejects.toThrow(/Can't fetch the subject/);
+		await expect(wrappedFn1(resource)).rejects.toThrow(
+			/Can't fetch the subject/,
+		);
 	});
-
 });

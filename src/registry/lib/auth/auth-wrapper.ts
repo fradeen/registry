@@ -13,7 +13,7 @@ export function withAuth<
 	Args extends [ResourceMap[keyof ResourceMap], ...any[]],
 	Ret,
 >(options: {
-	subject: S | (() => (Promise<S | undefined> | (S | undefined)));
+	subject: S | (() => Promise<S | undefined> | (S | undefined));
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: true;
@@ -29,7 +29,7 @@ export function withAuth<
 	Args extends any[],
 	Ret,
 >(options: {
-	subject: S | (() => (Promise<S | undefined> | (S | undefined)));
+	subject: S | (() => Promise<S | undefined> | (S | undefined));
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: false;
@@ -61,7 +61,7 @@ export function withAuth<
 	Args extends any[],
 	Ret,
 >(options: {
-	subject: S | (() => (Promise<S | undefined> | (S | undefined)));
+	subject: S | (() => Promise<S | undefined> | (S | undefined));
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: boolean;
@@ -70,8 +70,9 @@ export function withAuth<
 }): (...args: Args) => Promise<Ret> {
 	return async (...args: Args): Promise<Ret> => {
 		const { subject, ac, action, extractResource, fn, resource } = options;
-		const resolvedSubject = typeof subject === "function" ? await subject() : subject
-		if(!resolvedSubject) throw new AuthError("Can't fetch the subject.")
+		const resolvedSubject =
+			typeof subject === "function" ? await subject() : subject;
+		if (!resolvedSubject) throw new AuthError("Can't fetch the subject.");
 		if (
 			resource === undefined &&
 			(Array.isArray(args[0]) ||
@@ -84,7 +85,9 @@ export function withAuth<
 			extractResource
 				? (args[0] as ResourceMap[keyof ResourceMap])
 				: (resource as Resource);
-		const isAuthorized = await ac.can(resolvedSubject)[action](resourceForCheck);
+		const isAuthorized = await ac
+			.can(resolvedSubject)
+			[action](resourceForCheck);
 		if (!isAuthorized) throw new AuthError("Not Authorized.");
 		return await fn(...args);
 	};
