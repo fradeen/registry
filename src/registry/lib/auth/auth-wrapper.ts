@@ -13,7 +13,7 @@ export function withAuth<
 	Args extends [ResourceMap[keyof ResourceMap], ...any[]],
 	Ret,
 >(options: {
-	subject: S;
+	subject: S | (() => (Promise<S | undefined> | (S | undefined)));
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: true;
@@ -29,7 +29,7 @@ export function withAuth<
 	Args extends any[],
 	Ret,
 >(options: {
-	subject: S;
+	subject: S | (() => (Promise<S | undefined> | (S | undefined)));
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: false;
@@ -41,7 +41,7 @@ export function withAuth<
  * Creates a secured function wrapper that enforces access control
  * before executing the provided function.
  * @param {Object} options - Configuration options.
- * @param {S} options.subject - The subject (e.g., user) performing the action.
+ * @param {S} options.subject - The subject (e.g., user) performing the action or fn to fetch subject.
  * @param {AccessControl<S, Actions, ResourceMap>} options.ac - Access control instance.
  * @param {Actions[number]} options.action - The action being attempted.
  * @param {boolean} options.extractResource - Whether to extract the resource automatically, valid only when first arg of wrapped method is a valid resource.
@@ -61,7 +61,7 @@ export function withAuth<
 	Args extends any[],
 	Ret,
 >(options: {
-	subject: S;
+	subject: S | (() => (Promise<S | undefined> | (S | undefined)));
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: boolean;
@@ -70,6 +70,8 @@ export function withAuth<
 }): (...args: Args) => Promise<Ret> {
 	return async (...args: Args): Promise<Ret> => {
 		const { subject, ac, action, extractResource, fn, resource } = options;
+		const resolvedSubject = typeof subject === "function" ? await subject() : subject
+		if(!resolvedSubject) throw new AuthError("Can't fetch the subject.")
 		if (
 			resource === undefined &&
 			(Array.isArray(args[0]) ||
@@ -82,7 +84,7 @@ export function withAuth<
 			extractResource
 				? (args[0] as ResourceMap[keyof ResourceMap])
 				: (resource as Resource);
-		const isAuthorized = await ac.can(subject)[action](resourceForCheck);
+		const isAuthorized = await ac.can(resolvedSubject)[action](resourceForCheck);
 		if (!isAuthorized) throw new AuthError("Not Authorized.");
 		return await fn(...args);
 	};
