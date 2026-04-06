@@ -10,6 +10,7 @@ describe("AuthWrapper", () => {
 	const actions = ["read", "edit", "delete"] as const;
 
 	const mockGetConditions = vi.fn();
+	const mockGetUser = vi.fn();
 
 	const config = {
 		actions,
@@ -134,5 +135,60 @@ describe("AuthWrapper", () => {
 			fn: fnWithResource,
 		});
 		await expect(wrappedFn1(resource)).rejects.toThrow(/Not Authorized/);
+	});
+
+	it("works with getter fn for subject", async () => {
+		mockGetConditions.mockResolvedValueOnce([
+			{
+				kind: "all",
+				conditions: [
+					{ path: "$.subject.role", operator: "equal", value: "admin" },
+				],
+			},
+		]);
+		const fnWithoutResource = (message: string) => {
+			return message;
+		};
+		mockGetUser.mockResolvedValueOnce(subject);
+		const wrappedFn = withAuth({
+			subject: mockGetUser,
+			ac: ac,
+			action: "delete",
+			extractResource: false,
+			fn: fnWithoutResource,
+			resource: "doc",
+		});
+		const result = await wrappedFn("authorized");
+		expect(result).toBe("authorized");
+	});
+
+	it("it throws when fetching subject fails", async () => {
+		mockGetConditions.mockReset();
+		mockGetConditions.mockResolvedValueOnce([
+			{
+				kind: "all",
+				conditions: [
+					{
+						path: "$.subject.id",
+						operator: "notEqual",
+						value: "$.resource.ownerId",
+					},
+				],
+			},
+		]);
+		mockGetUser.mockResolvedValueOnce(undefined);
+		const fnWithResource = (resource: TestResource) => {
+			return resource.ownerId;
+		};
+		const wrappedFn1 = withAuth({
+			subject: mockGetUser,
+			ac: ac,
+			action: "delete",
+			extractResource: true,
+			fn: fnWithResource,
+		});
+		await expect(wrappedFn1(resource)).rejects.toThrow(
+			/Can't fetch the subject/,
+		);
 	});
 });
