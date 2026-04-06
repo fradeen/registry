@@ -3,6 +3,8 @@ import { AuthError } from "@/registry/lib/auth/error";
 import type { BaseResource } from "@/registry/lib/auth/types/resource";
 import type { BaseSubject } from "@/registry/lib/auth/types/subject";
 
+type MaybePromise<T> = Promise<T> | T;
+
 export function withAuth<
 	S extends BaseSubject,
 	Actions extends Readonly<Array<string>>,
@@ -13,11 +15,11 @@ export function withAuth<
 	Args extends [ResourceMap[keyof ResourceMap], ...any[]],
 	Ret,
 >(options: {
-	subject: S | (() => Promise<S | undefined> | (S | undefined));
+	subject: S | (() => MaybePromise<S | undefined>);
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: true;
-	fn: (...args: Args) => Ret | Promise<Ret>;
+	fn: (...args: Args) => MaybePromise<Ret>;
 }): (...args: Args) => Promise<Ret>;
 
 export function withAuth<
@@ -29,11 +31,11 @@ export function withAuth<
 	Args extends any[],
 	Ret,
 >(options: {
-	subject: S | (() => Promise<S | undefined> | (S | undefined));
+	subject: S | (() => MaybePromise<S | undefined>);
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: false;
-	fn: (...args: Args) => Ret | Promise<Ret>;
+	fn: (...args: Args) => MaybePromise<Ret>;
 	resource: Resource;
 }): (...args: Args) => Promise<Ret>;
 
@@ -61,11 +63,11 @@ export function withAuth<
 	Args extends any[],
 	Ret,
 >(options: {
-	subject: S | (() => Promise<S | undefined> | (S | undefined));
+	subject: S | (() => MaybePromise<S | undefined>);
 	ac: AccessControl<S, Actions, ResourceMap>;
 	action: Actions[number];
 	extractResource: boolean;
-	fn: (...args: Args) => Ret | Promise<Ret>;
+	fn: (...args: Args) => MaybePromise<Ret>;
 	resource?: Resource;
 }): (...args: Args) => Promise<Ret> {
 	return async (...args: Args): Promise<Ret> => {
