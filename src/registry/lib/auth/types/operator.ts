@@ -30,12 +30,7 @@ type DateOperators = (typeof DATE_OPERATORS)[number];
 export const MEMBERSHIP_OPERATORS = ["includes", "in"] as const;
 type MembershipOperators = (typeof MEMBERSHIP_OPERATORS)[number];
 
-export const OPERATORS = [
-	...BASE_OPERATORS,
-	...NUMBER_OPERATORS,
-	...DATE_OPERATORS,
-	...MEMBERSHIP_OPERATORS,
-] as const;
+export const OPERATORS = [...DATE_OPERATORS, ...MEMBERSHIP_OPERATORS] as const;
 
 type OperatorFor<T> = T extends string
 	? StringOperators
