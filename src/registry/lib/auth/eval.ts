@@ -1,11 +1,10 @@
-import includes from "lodash/includes";
-import isEqual from "lodash/isEqual";
 import { AuthError } from "@/registry/lib/auth/error";
 import type {
 	BaseCondition,
 	BaseConditionNode,
 } from "@/registry/lib/auth/types/condition";
 import { NUMBER_OPERATORS } from "@/registry/lib/auth/types/operator";
+import { dequal } from "dequal";
 
 type BaseContext = {
 	subject: Record<string, unknown>;
@@ -69,9 +68,9 @@ function evaluateNode(node: BaseConditionNode, context: BaseContext): boolean {
 	}
 	switch (operator) {
 		case "equal":
-			return isEqual(left, right);
+			return dequal(left, right);
 		case "notEqual":
-			return !isEqual(left, right);
+			return !dequal(left, right);
 
 		case "greaterThan":
 			return (left as number | Date) > (right as number | Date);
@@ -124,4 +123,8 @@ export function evaluateCondition(
 	} else if (condition.kind === "node") {
 		return evaluateNode(condition, context);
 	} else return false;
+}
+// includes with deep comparison
+function includes(list: unknown[], val: unknown): boolean {
+	return list.some((list_val) => dequal(list_val, val));
 }

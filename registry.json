@@ -8,8 +8,7 @@
 			"type": "registry:lib",
 			"title": "Attribute Based Access Control",
 			"description": "Attribute based access controll system",
-			"dependencies": ["lodash@^4.17.23"],
-			"devDependencies": ["@types/lodash@^4.17.23"],
+			"dependencies": ["dequal@^2.0.3"],
 			"files": [
 				{
 					"path": "src/registry/lib/auth/abac.ts",
