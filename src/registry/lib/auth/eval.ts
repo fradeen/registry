@@ -1,10 +1,10 @@
+import { dequal } from "dequal";
 import { AuthError } from "@/registry/lib/auth/error";
 import type {
 	BaseCondition,
 	BaseConditionNode,
 } from "@/registry/lib/auth/types/condition";
 import { NUMBER_OPERATORS } from "@/registry/lib/auth/types/operator";
-import { dequal } from "dequal";
 
 type BaseContext = {
 	subject: Record<string, unknown>;
