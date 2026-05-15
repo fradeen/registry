@@ -1,24 +1,19 @@
 {
 	"name": "registry",
 	"type": "module",
-	"version": "0.8.1",
+	"version": "0.8.2",
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
 		"format": "biome check --write",
 		"registry:build": "shadcn build",
-		"build": "npm run registry:build && npm run format",
+		"build": "pnpm run registry:build && pnpm run format",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage"
 	},
-	"devEngines": {
-		"packageManager": {
-			"name": "npm"
-		}
-	},
-	"packageManager": "npm@11.8.0",
+	"packageManager": "pnpm@11.1.2",
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.15",
 		"@edge-runtime/vm": "^5.0.0",
