@@ -15,14 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js (LTS)
         uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
+        cache: pnpm
       
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
