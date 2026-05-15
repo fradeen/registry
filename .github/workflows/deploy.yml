@@ -65,6 +65,6 @@ jobs:
 
       - name: Publish with Wrangler
         if: steps.create_tag.outputs.created == 'true'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
