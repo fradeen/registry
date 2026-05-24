@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js (LTS)
         uses: actions/setup-node@v6
@@ -65,6 +65,6 @@ jobs:
 
       - name: Publish with Wrangler
         if: steps.create_tag.outputs.created == 'true'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
