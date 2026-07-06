@@ -13,14 +13,14 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage"
 	},
-	"packageManager": "pnpm@11.1.2",
+	"packageManager": "pnpm@11.10.0",
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.16",
+		"@biomejs/biome": "^2.5.2",
 		"@edge-runtime/vm": "^5.0.0",
-		"@vitest/coverage-v8": "^4.1.8",
-		"shadcn": "^4.11.0",
-		"vitest": "^4.1.8",
-		"wrangler": "^4.100.0"
+		"@vitest/coverage-v8": "^4.1.9",
+		"shadcn": "^4.13.0",
+		"vitest": "^4.1.9",
+		"wrangler": "^4.107.0"
 	},
 	"dependencies": {
 		"dequal": "^2.0.3"
