@@ -4,6 +4,8 @@ updates:
     directory: "/"          
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 1
     open-pull-requests-limit: 5
     target-branch: "dev"
     groups:
