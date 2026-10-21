@@ -10,10 +10,15 @@ This repository provides a small, strongly-typed, and fully serializable ABAC he
 
 ### Installation
 
-Add "Access Controll" lib from this registry via the shadcn CLI
+Add "Access Control" lib from this registry via the shadcn CLI
 
 `
-npx shadcn@latest add https://registry.frad-fardeen.workers.dev/r/access-control.json
+pnpm dlx shadcn@latest add https://registry.frad-fardeen.workers.dev/r/access-control.json
+`
+or
+
+`
+pnpm dlx shadcn@latest add fradeen/registry/access-control
 `
 
 ### Key files
