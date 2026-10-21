@@ -21,7 +21,7 @@
 		"shadcn": "^4.22.1",
 		"typescript": "^7.0.2",
 		"vitest": "^5.0.5",
-		"wrangler": "^4.151.2"
+		"wrangler": "^4.151.3"
 	},
 	"dependencies": {
 		"dequal": "^2.0.3"
