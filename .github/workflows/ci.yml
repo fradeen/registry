@@ -3,9 +3,9 @@ name: CI
 on:
   pull_request:
     paths-ignore:
-      - 'README.md'
-      - '.github/**'
-      - '.gitignore'
+      - "README.md"
+      - ".github/**"
+      - ".gitignore"
 
 jobs:
   build-and-test:
@@ -21,14 +21,14 @@ jobs:
       - name: Setup Node.js (LTS)
         uses: actions/setup-node@v7
         with:
-          node-version: 'lts/*'
-          cache: 'pnpm'
-      
+          node-version: "lts/*"
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
       - name: Run Biome check
-        run: pnpm biome check 
+        run: pnpm biome check
 
       - name: Run build
         run: pnpm build

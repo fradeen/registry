@@ -1,6 +1,5 @@
 # Custom shadcn registry for Attribute Based Access Control (ABAC) system
 
-
 > [!WARNING]
 > **Alpha quality**
 >
@@ -12,14 +11,10 @@ This repository provides a small, strongly-typed, and fully serializable ABAC he
 
 Add "Access Control" lib from this registry via the shadcn CLI
 
-`
-pnpm dlx shadcn@latest add https://registry.frad-fardeen.workers.dev/r/access-control.json
-`
+`pnpm dlx shadcn@latest add https://registry.frad-fardeen.workers.dev/r/access-control.json`
 or
 
-`
-pnpm dlx shadcn@latest add fradeen/registry/access-control
-`
+`pnpm dlx shadcn@latest add fradeen/registry/access-control`
 
 ### Key files
 
@@ -54,11 +49,12 @@ AccessControl<S, Actions, ResourceMap>
 - ResourceMap: BaseResourceMap describing resource shapes
 
 #### Constructor config:
+
 - actions: ReadonlyArray<string> (the same tuple type used in generics)
 - getConditions: async (subject: S, resourceOrType: Resource | string, action: Action, requiresResource: boolean) => Promise<Condition<S, Resource, boolean>[]>
   - requiresResource is true when a resource instance was passed to the check (so Conditions can reference resource fields).
 
-###  Usage: minimal example
+### Usage: minimal example
 
 creating types for subject, resources, actions...
 ```ts
@@ -170,20 +166,33 @@ const allowedByType = await ac
 
 Auth wrapper examples
 
-```ts 
+```ts
 //minimal subject/resource objects
-const subject: User = { id: 2, name: "Admin", role: "admin" }
-const resource:Doc = {type:"doc",ownerId:2,published:true}
+const subject: User = { id: 2, name: "Admin", role: "admin" };
+const resource: Doc = { type: "doc", ownerId: 2, published: true };
 
 //wrap method which do not have resource object as first arg, hence resource is provided and extractResource is set to false
-export const wrappedFn1 = withAuth({subject:subject,ac:ac,action:"delete",extractResource:false,fn:fnWithoutResource,resource:"doc"})
+export const wrappedFn1 = withAuth({
+	subject: subject,
+	ac: ac,
+	action: "delete",
+	extractResource: false,
+	fn: fnWithoutResource,
+	resource: "doc",
+});
 
 //wrap method which have resource as first arg, hence resource is not provided and extractResource is set to true
-export const wrappedFn2 = withAuth({subject:subject,ac:ac,action:"edit",extractResource:true,fn:fnWithResource})
+export const wrappedFn2 = withAuth({
+	subject: subject,
+	ac: ac,
+	action: "edit",
+	extractResource: true,
+	fn: fnWithResource,
+});
 
 //wrapped method is only run when authorization passes, else throws AuthError
-wrappedFn1("message")
-wrappedFn2(resource)
+wrappedFn1("message");
+wrappedFn2(resource);
 ```
 for more info on options for withAuth wrapper, just hover it in any editor with js-doc support or read inline js-doc comments in the implementation file `src/registry/lib/auth/auth-wrapper.ts`.
 
