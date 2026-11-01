@@ -9,7 +9,6 @@ export function withAuth<
 	S extends BaseSubject,
 	Actions extends Readonly<Array<string>>,
 	ResourceMap extends { [K in keyof ResourceMap]: BaseResource<K & string> },
-	// biome-ignore lint/correctness/noUnusedVariables: fn override
 	Resource extends ResourceMap[keyof ResourceMap]["type"],
 	// biome-ignore lint/suspicious/noExplicitAny: function with any arg can be wrapped
 	Args extends [ResourceMap[keyof ResourceMap], ...any[]],
